@@ -131,6 +131,7 @@ Mount this file in kube-apiserver:
 
 ## Authz
 The authz webhook just check if a user has right to perform an action on following condition:
+- if namespace is webhook
 - if user's group is admin he can perform all action on resources
 - if user's group is dev he can get or list resource(s)
 
@@ -231,4 +232,9 @@ NB: the certificate used for the webhook is configured to be able to validate th
 Specify the user and kubeconfig file
 ```
 # kubectl  --kubeconfig=admin.conf get pods  --user bob
+kubectl  --kubeconfig=admin.conf get pods  --user bob
+NAME                             READY   STATUS    RESTARTS   AGE
+authn-webhook-6dcb76c688-n94zk   1/1     Running   0          17h
+authz-webhook-79455f668f-h4xlc   1/1     Running   0          5h53m
+
 ```

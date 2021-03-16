@@ -38,20 +38,23 @@ func (a Authz) CheckAuthz(w http.ResponseWriter, r * http.Request){
 	groups := request.Spec.Groups
 	action := request.Spec.ResourceAttributes.Verb
 	log.Println("REQUEST : ",request)
-
-	if (contains(groups,"admin")){// admin can do anything
-		response.Status.Allowed = true
-	}else if (contains(groups,"dev")){
-		if (action != "get" && action != "list"){ //dev can read data only
-			response.Status.Allowed = false
-		}else{
+	
+    if(request.Spec.ResourceAttributes.Namespace == "webhook"){
+		if (contains(groups,"admin")){// admin can do anything
 			response.Status.Allowed = true
+		}else if (contains(groups,"dev")){
+			if (action != "get" && action != "list"){ //dev can read data only
+				response.Status.Allowed = false
+			}else{
+				response.Status.Allowed = true
+			}
+		}else{
+			response.Status.Allowed = false
 		}
+		log.Printf("%s in group %s perform %s on resource %s is allowed == ",username,groups,action,request.Spec.ResourceAttributes.Resource,response.Status.Allowed)
 	}else{
 		response.Status.Allowed = false
 	}
-	log.Printf("%s in group %s perform %s on resource %s is allowed == ",username,groups,action,request.Spec.ResourceAttributes.Resource,response.Status.Allowed)
-	
 	w.Header().Set("Content-type","application/json")
 	json.NewEncoder(w).Encode(response)
 
