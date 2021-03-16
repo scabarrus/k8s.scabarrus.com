@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: authn-webhook
+    run: authn-webhook
+  name: authn-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authn-webhook
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: authn-webhook
+    spec:
+      containers:
+      - name: authn-webhook
+        env:
+        - name: SECRET
+          valueFrom:
+            secretKeyRef:
+              key: secret
+              name: authn-secret
+        command:
+        - ./main
+        - -protocol=https
+        - -port=8080
+        - -cert=/go/src/pki/server.crt
+        - -key=/go/src/pki/server.key
+        - -secret=$(SECRET)
+        volumeMounts:
+          - mountPath: /go/src/pki
+            name: authn-cert-key
+        image: authentication-webhook:1.0
+        name: authentication-webhook
+        resources: {}
+      volumes:
+        - name: authn-cert-key
+          configMap:
+            name: authn-configmap
+      tolerations:
+        - key: kubernetes.io/worker
+          effect: NoSchedule
+          operator: Exists
+status: {}

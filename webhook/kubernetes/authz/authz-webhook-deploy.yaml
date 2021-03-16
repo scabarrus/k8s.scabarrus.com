@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: authz-webhook
+  name: authz-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authz-webhook
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: authz-webhook
+    spec:
+      containers:
+      - image: authorization-webhook:1.0
+        name: authz-webhook
+        command:
+        - ./main
+        - -protocol=https
+        - -port=8080
+        - -cert=/go/src/pki/server.crt
+        - -key=/go/src/pki/server.key
+        resources: {}
+        volumeMounts:
+          - mountPath: /go/src/pki
+            name: authz-cert-key
+      volumes:
+        - name: authz-cert-key
+          configMap:
+            name: authz-configmap
+      tolerations: 
+        - key: kubernetes.io/worker
+          effect: NoSchedule
+          operator: Exists
+status: {}
