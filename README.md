@@ -102,7 +102,7 @@ Create secret :
 Create configmap with certificate and key:
 ```
 # kubectl create configmap authn-configmap --from-file=server.crt --from-file=server.key
-
+```
 Create deployment and service :
 ```
 # kubectl apply -f k8s.scabarrus.com/webhook/kubernetes/authn/authn-deploy.yaml #Deploy pod
