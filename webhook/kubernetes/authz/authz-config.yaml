@@ -1,0 +1,25 @@
+# Kubernetes API version
+apiVersion: v1
+# kind of the API object
+kind: Config
+# clusters refers to the remote service.
+clusters:
+  - name: authz-webhook
+    cluster:
+      # CA for verifying the remote service.
+      certificate-authority: /etc/kubernetes/pki/ca.crt
+      # URL of remote service to query. Must use 'https'. May not include parameters.
+      server: https://192.168.169.129:31571/
+
+# users refers to the API Server's webhook configuration.
+users:
+  - name: api-server
+    user:
+      token: test-oken # cert for the webhook plugin to use
+# kubeconfig files require a context. Provide one for the API Server.
+current-context: webhook
+contexts:
+- context:
+    cluster: authz-webhook
+    user: api-server
+  name: webhook
