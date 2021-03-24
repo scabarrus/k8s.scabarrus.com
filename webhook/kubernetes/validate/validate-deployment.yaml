@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: validate-webhook
+  name: validate
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: validate-webhook
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: validate-webhook
+    spec:
+      containers:
+      - image: validate-webhook:1.0
+        name: validate
+        resources: {}
+        env: 
+          - name: GODEBUG
+            value: "x509ignoreCN=0"
+        command:
+          - ./main
+          - -protocol=https
+          - -port=8080
+          - -cert=/go/src/pki/server.crt
+          - -key=/go/src/pki/server.key
+        volumeMounts:
+          - name: cert-key
+            mountPath: /go/src/pki
+      volumes:
+        - configMap:
+           name: validate-configmap
+          name: cert-key
+status: {}
